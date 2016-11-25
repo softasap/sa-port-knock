@@ -1,0 +1,28 @@
+---
+# defaults file for sa-port-knock
+
+role_dir: "{{role_path}}"
+
+knock_firewall_type: ufw # ufw | iptables
+
+knock_default_props:
+    - {regexp: "^[#]?START_KNOCKD=*", line: "START_KNOCKD=1"}
+    - {regexp: "^[#]?KNOCKD_OPTS=*", line: '#KNOCKD_OPTS="-i eth1"'}
+
+knock_ports:
+  - {
+    name: "ssh",
+    sequence: "15000, 16000, 17000",
+    seq_timeout: 5,
+    port: 22,
+    tcpflags: syn,
+    cmd_timeout: 10
+    }
+  - {
+    name: "pptp",
+    sequence: "15001, 16001, 17001",
+    seq_timeout: 5,
+    port: 1723,
+    tcpflags: syn,
+    cmd_timeout: 1000
+    }

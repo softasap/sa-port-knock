@@ -1,0 +1,42 @@
+---
+- hosts: www
+
+  vars:
+    - root_dir: ..
+
+    - custom_knock_ports:
+      - {
+          name: "ssh",
+          sequence: "15000, 16000, 17000",
+          seq_timeout: 5,
+          port: 22,
+          tcpflags: syn,
+          cmd_timeout: 10
+        }
+
+
+  pre_tasks:
+    - debug: msg="Pre tasks section"
+
+  roles:
+     - {
+        role: "sa-box-bootstrap",
+        deploy_user: "slavko",
+        option_copy_initial_authorized_keys: true,
+        option_enforce_ssh_keys_login: true,
+        option_file2ban: false,
+        option_ufw: true,
+        option_monit: false
+       }
+
+     - {
+         role: "sa-port-knock",
+         knock_ports: "{{custom_knock_ports}}"
+       }
+
+  tasks:
+
+    - debug: msg="Tasks section"
+
+
+

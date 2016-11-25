@@ -1,0 +1,22 @@
+---
+  - name: KnockD | Install package
+    apt: pkg="knockd"
+    become: yes
+    tags:
+      - knockd
+
+  - name: KnockD | Template /etc/knockd.conf
+    template: src="{{role_dir}}/templates/knockd.conf.{{knock_firewall_type}}.j2" dest="/etc/knockd.conf"
+    become: yes
+    tags:
+      - knockd
+
+  - name: KnockD | Patch /etc/default/knockd
+    lineinfile: dest=/etc/default/knockd  regexp="{{item.regexp}}" line="{{item.line}}" insertafter="{{item.insertafter | default('EOF')}}"
+    with_items: "{{knock_default_props | default([])}}"
+    become: yes
+
+  - name: KnockD | Restart service
+    service: name="knockd" state="restarted" enabled="yes"
+    become: yes
+    when: docker_test is not defined
