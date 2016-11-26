@@ -1,5 +1,12 @@
 ---
 - hosts: all
+
+  pre_tasks:
+    - name: ufw
+      apt: pkg=ufw
+      become: yes 
+
+
   roles:
     - {
         role: "role_under_test",
