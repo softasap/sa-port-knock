@@ -25,9 +25,24 @@
     tags:
       - knockd
 
-  - name: KnockD | Delete hardened ports from the world
-    shell: ufw delete allow {{item.port}}/tcp
-    with_items: "{{knock_ports | default([])}}"
-    when: option_close_hardened_ports
-    tags:
-      - knockd
+  - block:
+
+    - name: KnockD | Delete hardened ports from the world
+      shell: ufw delete allow {{item.port}}/tcp
+      with_items: "{{knock_ports | default([])}}"
+      when: option_close_hardened_ports
+      tags:
+        - knockd
+
+    when: knock_firewall_type == "ufw" and docker_test is not defined
+
+  - block:
+
+    - name: KnockD | Delete hardened ports from the world
+      shell: /sbin/iptables -D INPUT -s %IP% -p tcp --dport {{item.port}} -j ACCEPT
+      with_items: "{{knock_ports | default([])}}"
+      when: option_close_hardened_ports
+      tags:
+        - knockd
+
+    when: knock_firewall_type == "iptables" and docker_test is not defined
