@@ -55,7 +55,8 @@ Advanced:
          role: "sa-port-knock",
          knock_ports: "{{custom_knock_ports}}",
          knock_default_props: "{{custom_knock_default_props}}",
-         knock_firewall_type: ufw # ufw | iptables        
+         knock_firewall_type: ufw # ufw | iptables,
+         option_close_hardened_ports: true        
        }
 
 ```
@@ -64,9 +65,56 @@ Advanced:
 Client usage
 ------------
 
+Usually I have few trusted networks, which I allow via dedicated rule using shell:
+
 ```bash
-knock server_ip_address 15000, 16000, 17000
-ssh user@server_ip_address
+ufw allow from 192.168.0.234/24 to any port 22 proto tcp
+```
+or using sa-box-bootstrap role:
+
+```YAML
+ufw_rules_allow_from_hosts:
+  - {
+      port: 22,
+      proto: tcp,
+      address: 192.168.0.264
+    }
+```
+
+Don't forget to disable your hardened port ,  like
+
+```bash
+ufw delete allow 22/tcp
+```
+
+or `option_close_hardened_ports` recipe setting
+
+Test setup:
+
+```bash
+
+➜  telnet  192.168.0.20 22
+Trying 192.168.0.20...
+
+➜  knock 192.168.0.20 15000, 16000, 17000
+
+➜  telnet  192.168.0.20 22               
+Trying 192.168.0.20...
+Connected to 192.168.0.20.
+Escape character is '^]'.
+SSH-2.0-OpenSSH_6.6.1p1 Ubuntu-2ubuntu2.7
+
+➜  ssh slavko@192.168.0.20
+
+Welcome to Ubuntu 14.04.1 LTS (GNU/Linux 3.13.0-32-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com/
+
+New release '16.04.1 LTS' available.
+Run 'do-release-upgrade' to upgrade to it.
+
+
+
 ```  
 
 

@@ -3,6 +3,8 @@
 
 role_dir: "{{role_path}}"
 
+option_close_hardened_ports: true
+
 knock_firewall_type: ufw # ufw | iptables
 
 knock_default_props:

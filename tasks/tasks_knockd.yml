@@ -15,8 +15,19 @@
     lineinfile: dest=/etc/default/knockd  regexp="{{item.regexp}}" line="{{item.line}}" insertafter="{{item.insertafter | default('EOF')}}"
     with_items: "{{knock_default_props | default([])}}"
     become: yes
+    tags:
+      - knockd
 
   - name: KnockD | Restart service
     service: name="knockd" state="restarted" enabled="yes"
     become: yes
     when: docker_test is not defined
+    tags:
+      - knockd
+
+  - name: KnockD | Delete hardened ports from the world
+    shell: ufw delete allow {{item.port}}/tcp
+    with_items: "{{knock_ports | default([])}}"
+    when: option_close_hardened_ports
+    tags:
+      - knockd
