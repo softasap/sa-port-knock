@@ -28,9 +28,10 @@
   - block:
 
     - name: KnockD | Delete hardened ports from the world
-      shell: ufw delete allow {{item.port}}/tcp
+      shell: ufw delete allow {{item.port}}/{{item.protocol | default('tcp')}}
       with_items: "{{knock_ports | default([])}}"
       when: option_close_hardened_ports
+      become: yes
       tags:
         - knockd
 
@@ -39,8 +40,9 @@
   - block:
 
     - name: KnockD | Delete hardened ports from the world
-      shell: /sbin/iptables -D INPUT -s %IP% -p tcp --dport {{item.port}} -j ACCEPT
+      shell: /sbin/iptables -D INPUT -s %IP% -p {{item.protocol | default('tcp')}} --dport {{item.port}} -j ACCEPT
       with_items: "{{knock_ports | default([])}}"
+      become: yes      
       when: option_close_hardened_ports
       tags:
         - knockd
