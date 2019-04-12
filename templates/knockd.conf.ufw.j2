@@ -1,11 +1,13 @@
 [options]
         UseSyslog
+#       interface = eth0
+#       logfile = /var/log/knockd.log
 
 {% for item in knock_ports %}
 [{{item.name}}]
       sequence      = {{item.sequence}}
       seq_timeout   = {{item.seq_timeout | default(5)}}
-      start_command = ufw insert 1 allow from %IP% to any port {{item.port}}
+      start_command = ufw allow from %IP% to any port {{item.port}}
       tcpflags      = {{item.tcpflags | default('syn')}}
       cmd_timeout   = {{item.cmd_timeout | default(10)}}
       stop_command  = ufw delete allow from %IP% to any port {{item.port}}
